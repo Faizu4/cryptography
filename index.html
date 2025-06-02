@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faizu cryptography</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f9fafb;
+            color: #1f2937;
+            padding: 2rem;
+            font-family: Arial, sans-serif;
+        }
+        input {
+            background-color: #ffffff; 
+            border: 1px solid #d1d5db;
+            outline: 1px solid blue;
+            width: 100%;
+            max-width: 400px;
+            padding: 0.6rem;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 10px 0;
+            max-width: 400px;
+            width: 107%;
+        }
+        
+        button {
+            flex: 1;
+            white-space: nowrap;
+            color: white;
+            cursor: pointer;
+            background-color: #2563eb;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            padding: 0.5rem 0.5rem;
+            margin: 2px;
+            font-size: 0.9rem;
+        }
+        #inputText {
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        #key {
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+        button:hover {background-color: #1d4ed8; border: 1px solid #2563eb}
+        input:focus {border: 1px solid #2563eb}
+        
+        .mainText-container {
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            max-width: 400px;
+            word-wrap: break-word;
+            width: 107%;
+            box-sizing: border-box;
+        }
+        .mainText-container:hover {background-color: #e5e7eb; border: 1px solid #9ca3af}
+        #mainText {
+            background-color: #f1f5f9;
+            padding: 0 1rem 0 1rem;
+            max-width: 400px;
+            border-radius: 0.5rem;
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Faizu cryptography</h1>
+    <input type="text" id="inputText" placeholder="Enter your text">
+    <br>
+    <input type="text" id="key" placeholder="Enter your key">
+    <br>
+    <div class="button-container">
+        <button id="submit">Submit</button>
+        <button id="clear">Clear</button>
+        <button id="copy">Copy</button>
+        <button id="cryptobutton">encryption</button>
+    </div>
+    <div class="mainText-container"><h4 id="mainText"></h4></div>
+    
+
+    <script>
+        text = document.getElementById("inputText")
+        key = document.getElementById("key")
+        submit = document.getElementById("submit")
+        clear = document.getElementById("clear")
+        copy = document.getElementById("copy")
+
+        cryptobutton = document.getElementById("cryptobutton")
+        mainText = document.getElementById("mainText")
+
+        cryptobutton.addEventListener("click", () => {
+            if (cryptobutton.innerText == "encryption") {
+                cryptobutton.innerText = "decryption" 
+            } else {cryptobutton.innerText = "encryption"}
+        })
+            
+        copy.addEventListener("click", () => {
+
+            navigator.clipboard.writeText(mainText.innerText)
+        })
+
+        clear.addEventListener("click", () => {
+            text.value = "";
+            //key.value =  "";
+        })
+
+        text.addEventListener("input", () => {
+            text.value = text.value.toLowerCase()
+        })
+
+        key.addEventListener("input", () => {
+            key.value = key.value.toLowerCase()
+        })
+
+        submit.addEventListener("click", () => {
+            if (text.value == "" || key.value == "") {
+                alert("please enter the fields")
+                return
+            }
+            fetch("/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: text.value,
+                    key: key.value,
+                    mode: cryptobutton.innerText
+                })
+            }).then(response => response.json()).then(data => {
+                console.log("client side", data)
+                if (cryptobutton.innerText == "encryption") {
+                    mainText.innerText = data["encrypted_text"]
+                } else {mainText.innerText = data["decrypted_text"]}
+            })
+        })
+            
+        document.addEventListener("keydown", (event) => {
+            if (event.key == "Enter") {
+                event.preventDefault()
+                submit.click()
+            }
+            if (event.ctrlKey && event.key == "s") {
+                event.preventDefault()
+                cryptobutton.click()
+            if (event.ctrlKey && event.key == "c") {
+                copy.click()
+            }
+            if (event.ctrlKey && event.key == "x") {
+                event.preventDefault()
+                clear.click()
+            }
+            }
+        })
+    </script>
+</body>
+</html>
