@@ -118,7 +118,7 @@
         })
 
         key.addEventListener("input", () => {
-            key.value = key.value.toLowerCase()
+            key.value = key.value.toLowerCase().replace(/\s/g, "");
         })
 
         submit.addEventListener("click", () => {
